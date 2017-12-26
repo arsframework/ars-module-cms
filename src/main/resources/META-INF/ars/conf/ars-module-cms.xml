@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<!-- CMS module configuration -->
+	
+	<!-- Tag Repository -->
+	<bean class="ars.module.cms.repository.StandardTagRepository"/>
+	
+	<!-- Channel Repository -->
+	<bean class="ars.module.cms.repository.StandardChannelRepository"/>
+	
+	<!-- Content Repository -->
+	<bean class="ars.module.cms.repository.StandardContentRepository"/>
+	
+	<!-- Static Service -->
+	<bean class="ars.module.cms.service.StandardStaticService">
+		<constructor-arg value="../../static/plugins"/>
+	</bean>
+	
+	<!-- Template Service -->
+	<bean class="ars.module.cms.service.StandardTemplateService">
+		<constructor-arg value="../../WEB-INF/templates/front"/>
+	</bean>
+	
+	<!-- Tag Service -->
+	<bean class="ars.module.cms.service.StandardTagService"/>
+	
+	<!-- Channel Service -->
+	<bean class="ars.module.cms.service.StandardChannelService">
+		<property name="templateDirectory" value="../../WEB-INF/templates/front/cms/channel"/>
+	</bean>
+	
+	<!-- Content Service -->
+	<bean class="ars.module.cms.service.StandardContentService">
+		<property name="templateDirectory" value="../../WEB-INF/templates/front/cms/content"/>
+	</bean>
+</beans>
