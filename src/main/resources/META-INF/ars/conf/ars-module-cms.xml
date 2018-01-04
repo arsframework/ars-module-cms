@@ -17,12 +17,20 @@
 	
 	<!-- Static Service -->
 	<bean class="ars.module.cms.service.StandardStaticService">
-		<constructor-arg value="../../static/plugins"/>
+		<property name="operator">
+			<bean class="ars.file.disk.DiskOperator">
+				<property name="workingDirectory" value="../../static/plugins"/>
+			</bean>
+		</property>
 	</bean>
 	
 	<!-- Template Service -->
 	<bean class="ars.module.cms.service.StandardTemplateService">
-		<constructor-arg value="../../WEB-INF/templates/front"/>
+		<property name="operator">
+			<bean class="ars.file.disk.DiskOperator">
+				<property name="workingDirectory" value="../../WEB-INF/templates/front"/>
+			</bean>
+		</property>
 	</bean>
 	
 	<!-- Tag Service -->
@@ -30,11 +38,24 @@
 	
 	<!-- Channel Service -->
 	<bean class="ars.module.cms.service.StandardChannelService">
-		<property name="templateDirectory" value="../../WEB-INF/templates/front/cms/channel"/>
+		<property name="templateOperator">
+			<bean class="ars.file.disk.DiskOperator">
+				<property name="workingDirectory" value="../../WEB-INF/templates/front/cms/channel"/>
+			</bean>
+		</property>
 	</bean>
 	
 	<!-- Content Service -->
 	<bean class="ars.module.cms.service.StandardContentService">
-		<property name="templateDirectory" value="../../WEB-INF/templates/front/cms/content"/>
+		<property name="staticOperator">
+			<bean class="ars.file.disk.DiskOperator">
+				<property name="workingDirectory" value="../../static/upload"/>
+			</bean>
+		</property>
+		<property name="templateOperator">
+			<bean class="ars.file.disk.DiskOperator">
+				<property name="workingDirectory" value="../../WEB-INF/templates/front/cms/content"/>
+			</bean>
+		</property>
 	</bean>
 </beans>

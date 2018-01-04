@@ -1,7 +1,5 @@
 package ars.module.cms.service;
 
-import ars.file.Operator;
-import ars.file.DiskOperator;
 import ars.file.StandardDocumentManager;
 import ars.module.cms.service.StaticService;
 
@@ -12,13 +10,5 @@ import ars.module.cms.service.StaticService;
  * 
  */
 public class StandardStaticService extends StandardDocumentManager implements StaticService {
-
-	public StandardStaticService(Operator operator) {
-		super(operator);
-	}
-
-	public StandardStaticService(String workingDirectory) {
-		super(new DiskOperator(workingDirectory));
-	}
 
 }

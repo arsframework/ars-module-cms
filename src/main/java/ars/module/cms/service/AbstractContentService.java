@@ -6,16 +6,16 @@ import java.util.Map;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.annotation.Resource;
-
 import ars.util.Beans;
 import ars.util.Nfile;
 import ars.util.Strings;
 import ars.file.Operator;
 import ars.file.Describe;
-import ars.file.DiskOperator;
+import ars.file.NameGenerator;
+import ars.file.DirectoryGenerator;
 import ars.file.RandomNameGenerator;
 import ars.file.DateDirectoryGenerator;
+import ars.file.disk.DiskOperator;
 import ars.invoke.channel.http.Https;
 import ars.invoke.channel.http.HttpRequester;
 import ars.invoke.request.Requester;
@@ -25,10 +25,10 @@ import ars.invoke.request.ParameterInvalidException;
 import ars.module.cms.model.Tag;
 import ars.module.cms.model.Channel;
 import ars.module.cms.model.Content;
-import ars.module.cms.service.TagService;
 import ars.module.cms.service.ContentService;
 import ars.module.people.model.User;
 import ars.module.people.model.Group;
+import ars.database.repository.Repository;
 import ars.database.repository.Repositories;
 import ars.database.service.StandardGeneralService;
 
@@ -48,34 +48,10 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 	public static final Pattern HTML_SCRIPT_PATTERN = Pattern.compile("<script[^>]*?>[\\s\\S]*?<\\/script>",
 			Pattern.CASE_INSENSITIVE);
 
-	private String staticDirectory; // 内容静态资源目录
-	private String templateDirectory; // 内容模板资源目录
-	private Operator staticOperator;
-	private Operator templateOperator;
-
-	@Resource
-	private TagService<Tag> tagService;
-
-	public String getStaticDirectory() {
-		return staticDirectory;
-	}
-
-	public void setStaticDirectory(String staticDirectory) {
-		this.staticDirectory = staticDirectory;
-		DiskOperator operator = new DiskOperator(staticDirectory);
-		operator.setNameGenerator(new RandomNameGenerator());
-		operator.setDirectoryGenerator(new DateDirectoryGenerator());
-		this.staticOperator = operator;
-	}
-
-	public String getTemplateDirectory() {
-		return templateDirectory;
-	}
-
-	public void setTemplateDirectory(String templateDirectory) {
-		this.templateDirectory = templateDirectory;
-		this.templateOperator = new DiskOperator(templateDirectory);
-	}
+	private Operator staticOperator = new DiskOperator();
+	private Operator templateOperator = new DiskOperator();
+	private NameGenerator nameGenerator = new RandomNameGenerator(); // 文件名称生成器
+	private DirectoryGenerator directoryGenerator = new DateDirectoryGenerator(); // 文件目录生成器
 
 	public Operator getStaticOperator() {
 		return staticOperator;
@@ -91,6 +67,22 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 
 	public void setTemplateOperator(Operator templateOperator) {
 		this.templateOperator = templateOperator;
+	}
+
+	public NameGenerator getNameGenerator() {
+		return nameGenerator;
+	}
+
+	public void setNameGenerator(NameGenerator nameGenerator) {
+		this.nameGenerator = nameGenerator;
+	}
+
+	public DirectoryGenerator getDirectoryGenerator() {
+		return directoryGenerator;
+	}
+
+	public void setDirectoryGenerator(DirectoryGenerator directoryGenerator) {
+		this.directoryGenerator = directoryGenerator;
 	}
 
 	@Override
@@ -127,11 +119,12 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 					continue;
 				}
 				synchronized (("__cms_tag_" + t).intern()) {
-					Tag entity = this.tagService.getRepository().query().eq("name", t).single();
+					Repository<Tag> repository = Repositories.getRepository(Tag.class);
+					Tag entity = repository.query().eq("name", t).single();
 					if (entity == null) {
 						entity = new Tag();
 						entity.setName(t);
-						this.tagService.saveObject(requester, entity);
+						repository.save(entity);
 					}
 				}
 			}
@@ -150,11 +143,12 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 						continue;
 					}
 					synchronized (("__cms_tag_" + t).intern()) {
-						Tag entity = this.tagService.getRepository().query().eq("name", t).single();
+						Repository<Tag> repository = Repositories.getRepository(Tag.class);
+						Tag entity = repository.query().eq("name", t).single();
 						if (entity == null) {
 							entity = new Tag();
 							entity.setName(t);
-							this.tagService.saveObject(requester, entity);
+							repository.save(entity);
 						}
 					}
 				}
@@ -174,9 +168,6 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 
 	@Override
 	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception {
-		if (this.templateOperator == null) {
-			throw new RuntimeException("Template operator has not been initialize");
-		}
 		return this.templateOperator.trees(null, parameters);
 	}
 
@@ -185,9 +176,6 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 		T content = this.getRepository().get(id);
 		if (content == null || content.getTemplate() == null) {
 			return null;
-		}
-		if (this.templateOperator == null) {
-			throw new RuntimeException("Template operator has not been initialize");
 		}
 		String workingDirectory = this.templateOperator.getWorkingDirectory();
 		String template = new File(workingDirectory, content.getTemplate()).getPath()
@@ -212,17 +200,24 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 	@Override
 	public String upload(Requester requester, String path, Nfile file, Map<String, Object> parameters)
 			throws Exception {
-		if (this.staticOperator == null) {
-			throw new RuntimeException("Static operator has not been initialize");
+		String name = file.getName();
+		if (this.directoryGenerator != null) {
+			if (path == null) {
+				path = this.directoryGenerator.generate(name);
+			} else {
+				path = new StringBuilder(path).append('/').append(this.directoryGenerator.generate(name)).toString();
+			}
 		}
-		return this.staticOperator.write(file, path);
+		if (this.nameGenerator != null) {
+			name = this.nameGenerator.generate(name);
+		}
+		path = path == null ? name : new StringBuilder(path).append('/').append(name).toString();
+		this.staticOperator.write(file, path);
+		return path;
 	}
 
 	@Override
 	public Nfile download(Requester requester, String path, Map<String, Object> parameters) throws Exception {
-		if (this.staticOperator == null) {
-			throw new RuntimeException("Static operator has not been initialize");
-		}
 		return this.staticOperator.read(path);
 	}
 

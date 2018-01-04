@@ -6,7 +6,7 @@ import java.util.List;
 
 import ars.file.Describe;
 import ars.file.Operator;
-import ars.file.DiskOperator;
+import ars.file.disk.DiskOperator;
 import ars.invoke.request.Requester;
 import ars.invoke.request.ParameterInvalidException;
 import ars.invoke.channel.http.Https;
@@ -27,17 +27,7 @@ import ars.database.service.StandardGeneralService;
  */
 public abstract class AbstractChannelService<T extends Channel> extends StandardGeneralService<T>
 		implements ChannelService<T> {
-	private String templateDirectory; // 栏目模板资源目录
-	private Operator templateOperator;
-
-	public String getTemplateDirectory() {
-		return templateDirectory;
-	}
-
-	public void setTemplateDirectory(String templateDirectory) {
-		this.templateDirectory = templateDirectory;
-		this.templateOperator = new DiskOperator(templateDirectory);
-	}
+	private Operator templateOperator = new DiskOperator();
 
 	public Operator getTemplateOperator() {
 		return templateOperator;
