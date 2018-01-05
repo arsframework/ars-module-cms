@@ -7,14 +7,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import ars.util.Beans;
-import ars.util.Nfile;
 import ars.util.Strings;
 import ars.file.Operator;
 import ars.file.Describe;
-import ars.file.NameGenerator;
-import ars.file.DirectoryGenerator;
-import ars.file.RandomNameGenerator;
-import ars.file.DateDirectoryGenerator;
 import ars.file.disk.DiskOperator;
 import ars.invoke.channel.http.Https;
 import ars.invoke.channel.http.HttpRequester;
@@ -48,18 +43,7 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 	public static final Pattern HTML_SCRIPT_PATTERN = Pattern.compile("<script[^>]*?>[\\s\\S]*?<\\/script>",
 			Pattern.CASE_INSENSITIVE);
 
-	private Operator staticOperator = new DiskOperator();
 	private Operator templateOperator = new DiskOperator();
-	private NameGenerator nameGenerator = new RandomNameGenerator(); // 文件名称生成器
-	private DirectoryGenerator directoryGenerator = new DateDirectoryGenerator(); // 文件目录生成器
-
-	public Operator getStaticOperator() {
-		return staticOperator;
-	}
-
-	public void setStaticOperator(Operator staticOperator) {
-		this.staticOperator = staticOperator;
-	}
 
 	public Operator getTemplateOperator() {
 		return templateOperator;
@@ -67,22 +51,6 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 
 	public void setTemplateOperator(Operator templateOperator) {
 		this.templateOperator = templateOperator;
-	}
-
-	public NameGenerator getNameGenerator() {
-		return nameGenerator;
-	}
-
-	public void setNameGenerator(NameGenerator nameGenerator) {
-		this.nameGenerator = nameGenerator;
-	}
-
-	public DirectoryGenerator getDirectoryGenerator() {
-		return directoryGenerator;
-	}
-
-	public void setDirectoryGenerator(DirectoryGenerator directoryGenerator) {
-		this.directoryGenerator = directoryGenerator;
 	}
 
 	@Override
@@ -195,30 +163,6 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 			}
 		}
 		return 0;
-	}
-
-	@Override
-	public String upload(Requester requester, String path, Nfile file, Map<String, Object> parameters)
-			throws Exception {
-		String name = file.getName();
-		if (this.directoryGenerator != null) {
-			if (path == null) {
-				path = this.directoryGenerator.generate(name);
-			} else {
-				path = new StringBuilder(path).append('/').append(this.directoryGenerator.generate(name)).toString();
-			}
-		}
-		if (this.nameGenerator != null) {
-			name = this.nameGenerator.generate(name);
-		}
-		path = path == null ? name : new StringBuilder(path).append('/').append(name).toString();
-		this.staticOperator.write(file, path);
-		return path;
-	}
-
-	@Override
-	public Nfile download(Requester requester, String path, Map<String, Object> parameters) throws Exception {
-		return this.staticOperator.read(path);
 	}
 
 }

@@ -85,18 +85,12 @@ public abstract class AbstractChannelService<T extends Channel> extends Standard
 
 	@Override
 	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception {
-		if (this.templateOperator == null) {
-			throw new RuntimeException("Template operator has not been initialize");
-		}
 		return this.templateOperator.trees(null, parameters);
 	}
 
 	@Override
 	public String view(HttpRequester requester, Integer id, String code, Map<String, Object> parameters)
 			throws Exception {
-		if (this.templateOperator == null) {
-			throw new RuntimeException("Template operator has not been initialize");
-		}
 		T channel = id != null ? this.getRepository().get(id)
 				: code != null ? this.getRepository().query().eq("code", code).single() : null;
 		if (channel == null || channel.getTemplate() == null) {

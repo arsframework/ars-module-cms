@@ -3,7 +3,6 @@ package ars.module.cms.service;
 import java.util.Map;
 import java.util.List;
 
-import ars.util.Nfile;
 import ars.file.Describe;
 import ars.invoke.local.Api;
 import ars.invoke.local.Param;
@@ -67,41 +66,5 @@ public interface ContentService<T extends Content> extends BasicService<T> {
 	@Api("accesses")
 	public int accesses(Requester requester, @Param(name = "id", required = true) Integer id,
 			Map<String, Object> parameters);
-
-	/**
-	 * 上传文件
-	 * 
-	 * @param requester
-	 *            请求对象
-	 * @param path
-	 *            文件目录
-	 * @param file
-	 *            文件对象
-	 * @param parameters
-	 *            请求参数
-	 * @return 文件路径
-	 * @throws Exception
-	 *             操作异常
-	 */
-	@Api("static/upload")
-	public String upload(Requester requester, @Param(name = "path") String path,
-			@Param(name = "file", required = true) Nfile file, Map<String, Object> parameters) throws Exception;
-
-	/**
-	 * 下载文件
-	 * 
-	 * @param requester
-	 *            请求对象
-	 * @param path
-	 *            文件路径
-	 * @param parameters
-	 *            附件过滤参数
-	 * @return 文件对象
-	 * @throws Exception
-	 *             操作异常
-	 */
-	@Api("static/download")
-	public Nfile download(Requester requester, @Param(name = "path", required = true) String path,
-			Map<String, Object> parameters) throws Exception;
 
 }

@@ -58,4 +58,25 @@
 			</bean>
 		</property>
 	</bean>
+	
+	<!-- Register cms content static file upload/download api -->
+	<bean class="ars.spring.api.AnnotationMethodApiRegister">
+		<constructor-arg value="cms/content/static"/>
+		<constructor-arg>
+			<bean class="ars.file.StandardDocumentManager">
+				<property name="operator">
+					<bean class="ars.file.disk.DiskOperator">
+						<property name="workingDirectory" value="../../static/upload/cms"/>
+					</bean>
+				</property>
+				<property name="nameGenerator">
+					<bean class="ars.file.RandomNameGenerator"/>
+				</property>
+				<property name="directoryGenerator">
+					<bean class="ars.file.DateDirectoryGenerator"/>
+				</property>
+			</bean>
+		</constructor-arg>
+		<constructor-arg value="upload,download"/>
+	</bean>
 </beans>
