@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>com.arsframework</groupId>
 			<artifactId>ars-core</artifactId>
-			<version>1.2.6</version>
+			<version>1.2.7</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.arsframework/ars-database -->
