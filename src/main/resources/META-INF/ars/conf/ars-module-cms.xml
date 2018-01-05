@@ -47,11 +47,6 @@
 	
 	<!-- Content Service -->
 	<bean class="ars.module.cms.service.StandardContentService">
-		<property name="staticOperator">
-			<bean class="ars.file.disk.DiskOperator">
-				<property name="workingDirectory" value="../../static/upload"/>
-			</bean>
-		</property>
 		<property name="templateOperator">
 			<bean class="ars.file.disk.DiskOperator">
 				<property name="workingDirectory" value="../../WEB-INF/templates/front/cms/content"/>
