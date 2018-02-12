@@ -1,21 +1,19 @@
 package ars.module.cms.service;
 
-import java.io.File;
-import java.io.Serializable;
 import java.util.Map;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.io.Serializable;
 
 import ars.util.Beans;
 import ars.util.Strings;
 import ars.file.Operator;
 import ars.file.Describe;
 import ars.file.disk.DiskOperator;
-import ars.invoke.channel.http.Https;
+import ars.invoke.channel.http.HttpChannel;
 import ars.invoke.channel.http.HttpRequester;
 import ars.invoke.request.Requester;
 import ars.invoke.request.AccessDeniedException;
-import ars.invoke.request.RequestHandleException;
 import ars.invoke.request.ParameterInvalidException;
 import ars.module.cms.model.Tag;
 import ars.module.cms.model.Channel;
@@ -43,14 +41,40 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 	public static final Pattern HTML_SCRIPT_PATTERN = Pattern.compile("<script[^>]*?>[\\s\\S]*?<\\/script>",
 			Pattern.CASE_INSENSITIVE);
 
-	private Operator templateOperator = new DiskOperator();
+	private Operator operator = new DiskOperator();
 
-	public Operator getTemplateOperator() {
-		return templateOperator;
+	public Operator getOperator() {
+		return operator;
 	}
 
-	public void setTemplateOperator(Operator templateOperator) {
-		this.templateOperator = templateOperator;
+	public void setOperator(Operator operator) {
+		this.operator = operator;
+	}
+
+	/**
+	 * 保存内容标签
+	 * 
+	 * @param name
+	 *            标签名称
+	 */
+	protected void saveTag(String name) {
+		if (name != null) {
+			Repository<Tag> repository = Repositories.getRepository(Tag.class);
+			for (String item : name.split("[,，]")) {
+				item = item.trim();
+				if (item.isEmpty()) {
+					continue;
+				}
+				synchronized (("__cms_tag_" + item).intern()) {
+					Tag entity = repository.query().eq("name", item).single();
+					if (entity == null) {
+						entity = new Tag();
+						entity.setName(item);
+						repository.save(entity);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -64,7 +88,7 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 			for (Channel channel : entity.getChannels()) {
 				for (Group group : channel.getGroups()) {
 					if (!group.getKey().startsWith(owner.getGroup().getKey())) {
-						throw new AccessDeniedException("Illegal operation");
+						throw new ParameterInvalidException("channels", "illegal");
 					}
 				}
 			}
@@ -79,76 +103,52 @@ public abstract class AbstractContentService<T extends Content> extends Standard
 
 	@Override
 	public Serializable saveObject(Requester requester, T object) {
-		String tag = object.getTag();
-		if (tag != null) {
-			for (String t : tag.split("[,，]")) {
-				t = t.trim();
-				if (t.isEmpty()) {
-					continue;
-				}
-				synchronized (("__cms_tag_" + t).intern()) {
-					Repository<Tag> repository = Repositories.getRepository(Tag.class);
-					Tag entity = repository.query().eq("name", t).single();
-					if (entity == null) {
-						entity = new Tag();
-						entity.setName(t);
-						repository.save(entity);
-					}
-				}
-			}
-		}
+		this.saveTag(object.getTag());
 		return super.saveObject(requester, object);
 	}
 
 	@Override
 	public void updateObject(Requester requester, T object) {
-		if (object.getTag() != null) {
-			T old = this.getRepository().get(object.getId());
-			if (!Beans.isEqual(old.getTag(), object.getTag())) {
-				for (String t : object.getTag().split("[,，]")) {
-					t = t.trim();
-					if (t.isEmpty()) {
-						continue;
-					}
-					synchronized (("__cms_tag_" + t).intern()) {
-						Repository<Tag> repository = Repositories.getRepository(Tag.class);
-						Tag entity = repository.query().eq("name", t).single();
-						if (entity == null) {
-							entity = new Tag();
-							entity.setName(t);
-							repository.save(entity);
-						}
-					}
-				}
-			}
+		if (object.getTag() != null
+				&& !Beans.isEqual(this.getRepository().get(object.getId()).getTag(), object.getTag())) {
+			this.saveTag(object.getTag());
 		}
 		super.updateObject(requester, object);
 	}
 
 	@Override
 	public void deleteObject(Requester requester, T object) {
-		if (requester.getUser().equals(object.getCreator()) && !Repositories.getRepository(User.class).query()
-				.eq("code", requester.getUser()).single().getAdmin()) {
-			throw new RequestHandleException("No delete permission");
+		User owner = Repositories.getRepository(User.class).query().eq("code", requester.getUser()).single();
+		if (!owner.getAdmin()) {
+			for (Channel channel : object.getChannels()) {
+				for (Group group : channel.getGroups()) {
+					if (!group.getKey().startsWith(owner.getGroup().getKey())) {
+						throw new AccessDeniedException("error.data.unauthorized");
+					}
+				}
+			}
 		}
 		super.deleteObject(requester, object);
 	}
 
 	@Override
 	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception {
-		return this.templateOperator.trees(null, parameters);
+		return this.operator.trees(null, parameters);
 	}
 
 	@Override
-	public String view(HttpRequester requester, Integer id, Map<String, Object> parameters) throws Exception {
-		T content = this.getRepository().get(id);
-		if (content == null || content.getTemplate() == null) {
-			return null;
+	public String view(HttpRequester requester, Map<String, Object> parameters) throws Exception {
+		T content = this.object(requester, parameters);
+		return content == null || content.getTemplate() == null ? null
+				: ((HttpChannel) requester.getChannel()).view(requester, content.getTemplate(), content);
+	}
+
+	@Override
+	public void render(HttpRequester requester, Map<String, Object> parameters) throws Exception {
+		T content = this.object(requester, parameters);
+		if (content != null && content.getTemplate() != null) {
+			((HttpChannel) requester.getChannel()).render(requester, content.getTemplate(), content);
 		}
-		String workingDirectory = this.templateOperator.getWorkingDirectory();
-		String template = new File(workingDirectory, content.getTemplate()).getPath()
-				.substring(Https.ROOT_PATH.length());
-		return Https.render(requester, template, content, parameters);
 	}
 
 	@Override

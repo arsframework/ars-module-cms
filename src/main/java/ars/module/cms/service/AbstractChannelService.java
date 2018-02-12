@@ -1,6 +1,5 @@
 package ars.module.cms.service;
 
-import java.io.File;
 import java.util.Map;
 import java.util.List;
 
@@ -8,13 +7,17 @@ import ars.file.Describe;
 import ars.file.Operator;
 import ars.file.disk.DiskOperator;
 import ars.invoke.request.Requester;
+import ars.invoke.request.AccessDeniedException;
 import ars.invoke.request.ParameterInvalidException;
-import ars.invoke.channel.http.Https;
+import ars.invoke.channel.http.HttpChannel;
 import ars.invoke.channel.http.HttpRequester;
 import ars.module.cms.model.Channel;
 import ars.module.cms.service.ChannelService;
+import ars.module.people.model.User;
+import ars.module.people.model.Group;
 import ars.database.repository.Query;
 import ars.database.repository.Repository;
+import ars.database.repository.Repositories;
 import ars.database.service.StandardGeneralService;
 
 /**
@@ -27,14 +30,14 @@ import ars.database.service.StandardGeneralService;
  */
 public abstract class AbstractChannelService<T extends Channel> extends StandardGeneralService<T>
 		implements ChannelService<T> {
-	private Operator templateOperator = new DiskOperator();
+	private Operator operator = new DiskOperator();
 
-	public Operator getTemplateOperator() {
-		return templateOperator;
+	public Operator getOperator() {
+		return operator;
 	}
 
-	public void setTemplateOperator(Operator templateOperator) {
-		this.templateOperator = templateOperator;
+	public void setOperator(Operator operator) {
+		this.operator = operator;
 	}
 
 	@Override
@@ -42,6 +45,14 @@ public abstract class AbstractChannelService<T extends Channel> extends Standard
 		super.initObject(requester, entity, parameters);
 		if (entity.getGroups().isEmpty()) {
 			throw new ParameterInvalidException("groups", "required");
+		}
+		User owner = Repositories.getRepository(User.class).query().eq("code", requester.getUser()).single();
+		if (!owner.getAdmin()) {
+			for (Group group : entity.getGroups()) {
+				if (!group.getKey().startsWith(owner.getGroup().getKey())) {
+					throw new ParameterInvalidException("groups", "illegal");
+				}
+			}
 		}
 		Channel parent = entity.getParent();
 		Query<T> query = this.getRepository().query().ne("id", entity.getId()).eq("name", entity.getName());
@@ -72,34 +83,48 @@ public abstract class AbstractChannelService<T extends Channel> extends Standard
 					parent = (T) parent.getParent();
 				}
 			} else if (object.getActive() == Boolean.FALSE) {
-				List<T> menus = repository.query().ne("id", object.getId()).eq("active", true)
+				List<T> channels = repository.query().ne("id", object.getId()).eq("active", true)
 						.start("key", object.getKey()).list();
-				for (int i = 0; i < menus.size(); i++) {
-					T menu = menus.get(i);
-					menu.setActive(false);
-					repository.update(menu);
+				for (int i = 0; i < channels.size(); i++) {
+					T channel = channels.get(i);
+					channel.setActive(false);
+					repository.update(channel);
 				}
 			}
 		}
 	}
 
 	@Override
-	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception {
-		return this.templateOperator.trees(null, parameters);
+	public void deleteObject(Requester requester, T object) {
+		User owner = Repositories.getRepository(User.class).query().eq("code", requester.getUser()).single();
+		if (!owner.getAdmin()) {
+			for (Group group : object.getGroups()) {
+				if (!group.getKey().startsWith(owner.getGroup().getKey())) {
+					throw new AccessDeniedException("error.data.unauthorized");
+				}
+			}
+		}
+		super.deleteObject(requester, object);
 	}
 
 	@Override
-	public String view(HttpRequester requester, Integer id, String code, Map<String, Object> parameters)
-			throws Exception {
-		T channel = id != null ? this.getRepository().get(id)
-				: code != null ? this.getRepository().query().eq("code", code).single() : null;
-		if (channel == null || channel.getTemplate() == null) {
-			return null;
+	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception {
+		return this.operator.trees(null, parameters);
+	}
+
+	@Override
+	public String view(HttpRequester requester, Map<String, Object> parameters) throws Exception {
+		T channel = this.object(requester, parameters);
+		return channel == null || channel.getTemplate() == null ? null
+				: ((HttpChannel) requester.getChannel()).view(requester, channel.getTemplate(), channel);
+	}
+
+	@Override
+	public void render(HttpRequester requester, Map<String, Object> parameters) throws Exception {
+		T channel = this.object(requester, parameters);
+		if (channel != null && channel.getTemplate() != null) {
+			((HttpChannel) requester.getChannel()).render(requester, channel.getTemplate(), channel);
 		}
-		String workingDirectory = this.templateOperator.getWorkingDirectory();
-		String template = new File(workingDirectory, channel.getTemplate()).getPath()
-				.substring(Https.ROOT_PATH.length());
-		return Https.render(requester, template, channel, parameters);
 	}
 
 }

@@ -40,8 +40,6 @@ public interface ContentService<T extends Content> extends BasicService<T> {
 	 * 
 	 * @param requester
 	 *            请求对象
-	 * @param id
-	 *            文章主键
 	 * @param parameters
 	 *            请求参数
 	 * @return 文章视图
@@ -49,8 +47,20 @@ public interface ContentService<T extends Content> extends BasicService<T> {
 	 *             操作异常
 	 */
 	@Api("view")
-	public String view(HttpRequester requester, @Param(name = "id", required = true) Integer id,
-			Map<String, Object> parameters) throws Exception;
+	public String view(HttpRequester requester, Map<String, Object> parameters) throws Exception;
+
+	/**
+	 * 渲染文章视图
+	 * 
+	 * @param requester
+	 *            请求对象
+	 * @param parameters
+	 *            请求参数
+	 * @throws Exception
+	 *             操作异常
+	 */
+	@Api("render")
+	public void render(HttpRequester requester, Map<String, Object> parameters) throws Exception;
 
 	/**
 	 * 记录文章访问次数

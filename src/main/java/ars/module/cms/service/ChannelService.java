@@ -5,7 +5,6 @@ import java.util.List;
 
 import ars.file.Describe;
 import ars.invoke.local.Api;
-import ars.invoke.local.Param;
 import ars.invoke.request.Requester;
 import ars.invoke.channel.http.HttpRequester;
 import ars.module.cms.model.Channel;
@@ -44,10 +43,6 @@ public interface ChannelService<T extends Channel>
 	 * 
 	 * @param requester
 	 *            请求对象
-	 * @param id
-	 *            栏目主键
-	 * @param code
-	 *            栏目编号
 	 * @param parameters
 	 *            请求参数
 	 * @return 栏目视图
@@ -55,7 +50,19 @@ public interface ChannelService<T extends Channel>
 	 *             操作异常
 	 */
 	@Api("view")
-	public String view(HttpRequester requester, @Param(name = "id") Integer id, @Param(name = "code") String code,
-			Map<String, Object> parameters) throws Exception;
+	public String view(HttpRequester requester, Map<String, Object> parameters) throws Exception;
+
+	/**
+	 * 渲染栏目视图
+	 * 
+	 * @param requester
+	 *            请求对象
+	 * @param parameters
+	 *            请求参数
+	 * @throws Exception
+	 *             操作异常
+	 */
+	@Api("render")
+	public void render(HttpRequester requester, Map<String, Object> parameters) throws Exception;
 
 }
