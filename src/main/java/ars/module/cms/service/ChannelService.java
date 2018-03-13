@@ -1,6 +1,5 @@
 package ars.module.cms.service;
 
-import java.util.Map;
 import java.util.List;
 
 import ars.file.Describe;
@@ -10,8 +9,6 @@ import ars.invoke.channel.http.HttpRequester;
 import ars.module.cms.model.Channel;
 import ars.database.service.TreeService;
 import ars.database.service.BasicService;
-import ars.database.service.ExportService;
-import ars.database.service.ImportService;
 
 /**
  * 栏目业务操作接口
@@ -22,47 +19,40 @@ import ars.database.service.ImportService;
  *            数据模型
  */
 @Api("cms/channel")
-public interface ChannelService<T extends Channel>
-		extends BasicService<T>, TreeService<T>, ImportService<T>, ExportService<T> {
+public interface ChannelService<T extends Channel> extends BasicService<T>, TreeService<T> {
 	/**
 	 * 获取栏目模板
 	 * 
 	 * @param requester
 	 *            请求对象
-	 * @param parameters
-	 *            请求参数
 	 * @return 文件描述对象树列表
 	 * @throws Exception
 	 *             操作异常
 	 */
 	@Api("templates")
-	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception;
+	public List<Describe> templates(Requester requester) throws Exception;
 
 	/**
 	 * 获取栏目视图
 	 * 
 	 * @param requester
 	 *            请求对象
-	 * @param parameters
-	 *            请求参数
 	 * @return 栏目视图
 	 * @throws Exception
 	 *             操作异常
 	 */
 	@Api("view")
-	public String view(HttpRequester requester, Map<String, Object> parameters) throws Exception;
+	public String view(HttpRequester requester) throws Exception;
 
 	/**
 	 * 渲染栏目视图
 	 * 
 	 * @param requester
 	 *            请求对象
-	 * @param parameters
-	 *            请求参数
 	 * @throws Exception
 	 *             操作异常
 	 */
 	@Api("render")
-	public void render(HttpRequester requester, Map<String, Object> parameters) throws Exception;
+	public void render(HttpRequester requester) throws Exception;
 
 }

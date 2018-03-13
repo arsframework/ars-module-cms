@@ -35,7 +35,7 @@ public class Listing implements Serializable {
 		return paging;
 	}
 
-	public java.util.List<?> getObjects() {
+	public List<?> getObjects() {
 		return objects;
 	}
 

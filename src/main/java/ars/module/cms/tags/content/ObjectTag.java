@@ -1,10 +1,6 @@
 package ars.module.cms.tags.content;
 
-import java.util.Map;
-
-import ars.invoke.Invokes;
-import ars.invoke.request.Requester;
-import ars.module.cms.tags.content.AbstractContentTag;
+import ars.module.cms.tags.AbstractCmsTag;
 
 /**
  * 获取单个文章自定义标签
@@ -12,16 +8,11 @@ import ars.module.cms.tags.content.AbstractContentTag;
  * @author yongqiangwu
  * 
  */
-public class ObjectTag extends AbstractContentTag {
+public class ObjectTag extends AbstractCmsTag {
 
 	@Override
 	protected Object execute() throws Exception {
-		Map<String, Object> parameters = this.getParameters();
-		if (parameters.isEmpty()) {
-			return null;
-		}
-		Requester requester = Invokes.getCurrentRequester();
-		return requester.build("cms/content/object", parameters).execute();
+		return this.getRequester().execute("cms/content/object", this.getParameters());
 	}
 
 }

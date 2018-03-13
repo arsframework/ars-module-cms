@@ -6,8 +6,8 @@
 
 	<!-- CMS module configuration -->
 	
-	<!-- Tag Repository -->
-	<bean class="ars.module.cms.repository.StandardTagRepository"/>
+	<!-- Site Repository -->
+	<bean class="ars.module.cms.repository.StandardSiteRepository"/>
 	
 	<!-- Channel Repository -->
 	<bean class="ars.module.cms.repository.StandardChannelRepository"/>
@@ -15,11 +15,14 @@
 	<!-- Content Repository -->
 	<bean class="ars.module.cms.repository.StandardContentRepository"/>
 	
+	<!-- Category Repository -->
+	<bean class="ars.module.cms.repository.StandardCategoryRepository"/>
+	
 	<!-- Static Service -->
 	<bean class="ars.module.cms.service.StandardStaticService">
 		<property name="operator">
 			<bean class="ars.file.disk.DiskOperator">
-				<property name="workingDirectory" value="../../static/plugins"/>
+				<constructor-arg value="../../static/plugins"/>
 			</bean>
 		</property>
 	</bean>
@@ -28,31 +31,28 @@
 	<bean class="ars.module.cms.service.StandardTemplateService">
 		<property name="operator">
 			<bean class="ars.file.disk.DiskOperator">
-				<property name="workingDirectory" value="../../WEB-INF/templates/front"/>
+				<constructor-arg value="../../WEB-INF/templates/front"/>
 			</bean>
 		</property>
 	</bean>
 	
-	<!-- Tag Service -->
-	<bean class="ars.module.cms.service.StandardTagService"/>
+	<!-- Site Service -->
+	<bean class="ars.module.cms.service.StandardSiteService"/>
 	
 	<!-- Channel Service -->
 	<bean class="ars.module.cms.service.StandardChannelService">
-		<property name="templateOperator">
-			<bean class="ars.file.disk.DiskOperator">
-				<property name="workingDirectory" value="../../WEB-INF/templates/front/cms/channel"/>
-			</bean>
-		</property>
+		<property name="templateDirectory" value="../../WEB-INF/templates/front/cms/channel"/>
+		<property name="staticizeDirectory" value="../../static/html/channel"/>
 	</bean>
 	
 	<!-- Content Service -->
 	<bean class="ars.module.cms.service.StandardContentService">
-		<property name="templateOperator">
-			<bean class="ars.file.disk.DiskOperator">
-				<property name="workingDirectory" value="../../WEB-INF/templates/front/cms/content"/>
-			</bean>
-		</property>
+		<property name="templateDirectory" value="../../WEB-INF/templates/front/cms/content"/>
+		<property name="staticizeDirectory" value="../../static/html/content"/>
 	</bean>
+	
+	<!-- Category Service -->
+	<bean class="ars.module.cms.service.StandardCategoryService"/>
 	
 	<!-- Register cms content static file upload/download api -->
 	<bean class="ars.spring.api.AnnotationMethodApiRegister">
@@ -61,7 +61,7 @@
 			<bean class="ars.file.StandardDocumentManager">
 				<property name="operator">
 					<bean class="ars.file.disk.DiskOperator">
-						<property name="workingDirectory" value="../../static/upload/cms"/>
+						<constructor-arg value="../../static/upload/cms"/>
 					</bean>
 				</property>
 				<property name="nameGenerator">

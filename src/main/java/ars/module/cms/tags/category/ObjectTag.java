@@ -1,9 +1,9 @@
-package ars.module.cms.tags.channel;
+package ars.module.cms.tags.category;
 
 import ars.module.cms.tags.AbstractCmsTag;
 
 /**
- * 获取单个栏目自定义标签
+ * 获取单个类别自定义标签
  * 
  * @author yongqiangwu
  * 
@@ -12,7 +12,7 @@ public class ObjectTag extends AbstractCmsTag {
 
 	@Override
 	protected Object execute() throws Exception {
-		return this.getRequester().execute("cms/channel/object", this.getParameters());
+		return this.getRequester().execute("cms/category/object", this.getParameters());
 	}
 
 }

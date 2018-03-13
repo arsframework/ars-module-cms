@@ -1,7 +1,5 @@
 package ars.module.cms.tags.channel;
 
-import ars.invoke.Invokes;
-import ars.invoke.request.Requester;
 import ars.module.cms.tags.Paging;
 import ars.module.cms.tags.AbstractCmsTag;
 
@@ -15,8 +13,7 @@ public class PagingTag extends AbstractCmsTag {
 
 	@Override
 	protected Object execute() throws Exception {
-		Requester requester = Invokes.getCurrentRequester();
-		Integer count = (Integer) requester.build("cms/channel/count", this.getParameters()).execute();
+		Integer count = (Integer) this.getRequester().execute("cms/channel/count", this.getParameters());
 		return new Paging(count, this.getPage(), this.getSize());
 	}
 

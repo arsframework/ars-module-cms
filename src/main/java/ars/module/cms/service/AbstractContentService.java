@@ -1,28 +1,20 @@
 package ars.module.cms.service;
 
-import java.util.Map;
+import java.io.File;
+import java.io.OutputStream;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.io.Serializable;
 
-import ars.util.Beans;
+import ars.util.Servers;
+import ars.util.Streams;
 import ars.util.Strings;
-import ars.file.Operator;
 import ars.file.Describe;
 import ars.file.disk.DiskOperator;
-import ars.invoke.channel.http.HttpChannel;
-import ars.invoke.channel.http.HttpRequester;
 import ars.invoke.request.Requester;
-import ars.invoke.request.AccessDeniedException;
 import ars.invoke.request.ParameterInvalidException;
-import ars.module.cms.model.Tag;
-import ars.module.cms.model.Channel;
+import ars.invoke.channel.http.Https;
+import ars.invoke.channel.http.HttpRequester;
 import ars.module.cms.model.Content;
 import ars.module.cms.service.ContentService;
-import ars.module.people.model.User;
-import ars.module.people.model.Group;
-import ars.database.repository.Repository;
-import ars.database.repository.Repositories;
 import ars.database.service.StandardGeneralService;
 
 /**
@@ -35,134 +27,89 @@ import ars.database.service.StandardGeneralService;
  */
 public abstract class AbstractContentService<T extends Content> extends StandardGeneralService<T>
 		implements ContentService<T> {
-	/**
-	 * Html标本标签正则表达匹配对象
-	 */
-	public static final Pattern HTML_SCRIPT_PATTERN = Pattern.compile("<script[^>]*?>[\\s\\S]*?<\\/script>",
-			Pattern.CASE_INSENSITIVE);
+	private String templateDirectory = Strings.TEMP_PATH; // 模板文件目录
+	private String staticizeDirectory = Strings.TEMP_PATH; // 静态化文件目录
 
-	private Operator operator = new DiskOperator();
-
-	public Operator getOperator() {
-		return operator;
+	public String getTemplateDirectory() {
+		return templateDirectory;
 	}
 
-	public void setOperator(Operator operator) {
-		this.operator = operator;
+	public void setTemplateDirectory(String templateDirectory) {
+		this.templateDirectory = Strings.getRealPath(templateDirectory);
 	}
 
-	/**
-	 * 保存内容标签
-	 * 
-	 * @param name
-	 *            标签名称
-	 */
-	protected void saveTag(String name) {
-		if (name != null) {
-			Repository<Tag> repository = Repositories.getRepository(Tag.class);
-			for (String item : name.split("[,，]")) {
-				item = item.trim();
-				if (item.isEmpty()) {
-					continue;
-				}
-				synchronized (("__cms_tag_" + item).intern()) {
-					Tag entity = repository.query().eq("name", item).single();
-					if (entity == null) {
-						entity = new Tag();
-						entity.setName(item);
-						repository.save(entity);
-					}
-				}
-			}
-		}
+	public String getStaticizeDirectory() {
+		return staticizeDirectory;
+	}
+
+	public void setStaticizeDirectory(String staticizeDirectory) {
+		this.staticizeDirectory = Strings.getRealPath(staticizeDirectory);
 	}
 
 	@Override
-	public void initObject(Requester requester, T entity, Map<String, Object> parameters) {
-		super.initObject(requester, entity, parameters);
+	public void initObject(Requester requester, T entity) {
+		super.initObject(requester, entity);
 		if (entity.getChannels().isEmpty()) {
 			throw new ParameterInvalidException("channels", "required");
 		}
-		User owner = Repositories.getRepository(User.class).query().eq("code", requester.getUser()).single();
-		if (!owner.getAdmin()) {
-			for (Channel channel : entity.getChannels()) {
-				for (Group group : channel.getGroups()) {
-					if (!group.getKey().startsWith(owner.getGroup().getKey())) {
-						throw new ParameterInvalidException("channels", "illegal");
-					}
-				}
-			}
-		}
-		if (entity.getTitle() != null) {
-			entity.setTitle(HTML_SCRIPT_PATTERN.matcher(entity.getTitle()).replaceAll(Strings.EMPTY_STRING));
-		}
-		if (entity.getTxt() != null) {
-			entity.setTxt(HTML_SCRIPT_PATTERN.matcher(entity.getTxt()).replaceAll(Strings.EMPTY_STRING));
-		}
+		entity.setTxt(Https.getSafeHtml(entity.getTxt()));
 	}
 
 	@Override
-	public Serializable saveObject(Requester requester, T object) {
-		this.saveTag(object.getTag());
-		return super.saveObject(requester, object);
+	public List<Describe> templates(Requester requester) throws Exception {
+		return new DiskOperator(this.templateDirectory).trees(null, requester.getParameters());
 	}
 
 	@Override
-	public void updateObject(Requester requester, T object) {
-		if (object.getTag() != null
-				&& !Beans.isEqual(this.getRepository().get(object.getId()).getTag(), object.getTag())) {
-			this.saveTag(object.getTag());
-		}
-		super.updateObject(requester, object);
+	public String view(HttpRequester requester) throws Exception {
+		T content = this.object(requester);
+		return content == null || content.getTemplate() == null ? null : requester.view(content.getTemplate(), content);
 	}
 
 	@Override
-	public void deleteObject(Requester requester, T object) {
-		User owner = Repositories.getRepository(User.class).query().eq("code", requester.getUser()).single();
-		if (!owner.getAdmin()) {
-			for (Channel channel : object.getChannels()) {
-				for (Group group : channel.getGroups()) {
-					if (!group.getKey().startsWith(owner.getGroup().getKey())) {
-						throw new AccessDeniedException("error.data.unauthorized");
-					}
-				}
-			}
-		}
-		super.deleteObject(requester, object);
-	}
-
-	@Override
-	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception {
-		return this.operator.trees(null, parameters);
-	}
-
-	@Override
-	public String view(HttpRequester requester, Map<String, Object> parameters) throws Exception {
-		T content = this.object(requester, parameters);
-		return content == null || content.getTemplate() == null ? null
-				: ((HttpChannel) requester.getChannel()).view(requester, content.getTemplate(), content);
-	}
-
-	@Override
-	public void render(HttpRequester requester, Map<String, Object> parameters) throws Exception {
-		T content = this.object(requester, parameters);
+	public void render(HttpRequester requester) throws Exception {
+		T content = this.object(requester);
 		if (content != null && content.getTemplate() != null) {
-			((HttpChannel) requester.getChannel()).render(requester, content.getTemplate(), content);
-		}
-	}
-
-	@Override
-	public int accesses(Requester requester, Integer id, Map<String, Object> parameters) {
-		synchronized (("__cms_content_accesse_count_" + id).intern()) {
-			T content = this.getRepository().get(id);
-			if (content != null) {
-				int number = content.getAccesses();
-				content.setAccesses(++number);
-				this.updateObject(requester, content);
-				return number;
+			String name = new StringBuilder("content_").append(content.getId()).append(".html").toString();
+			File file = new File(this.staticizeDirectory, name);
+			if (!content.getStaticize() || !file.exists()) {
+				synchronized (name.intern()) {
+					if (!content.getStaticize()) {
+						content = this.object(requester);
+					}
+					if (!content.getStaticize() || !file.exists()) {
+						requester.render(content.getTemplate(), content, file);
+						if (!content.getStaticize()) {
+							content.setStaticize(true);
+							this.getRepository().update(content);
+						}
+					}
+				}
 			}
+			OutputStream os = requester.getHttpServletResponse().getOutputStream();
+			try {
+				Streams.write(file, os);
+			} finally {
+				os.close();
+			}
+
+			// 更新内容访问量
+			final int id = content.getId();
+			Servers.submit(new Runnable() {
+
+				@Override
+				public void run() {
+					synchronized (("__cms_content_accesse_count_" + id).intern()) {
+						T content = getRepository().get(id);
+						if (content != null) {
+							content.setAccesses(content.getAccesses() + 1);
+							getRepository().update(content);
+						}
+					}
+				}
+
+			});
 		}
-		return 0;
 	}
 
 }

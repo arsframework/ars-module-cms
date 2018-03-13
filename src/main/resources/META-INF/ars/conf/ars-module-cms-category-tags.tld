@@ -3,14 +3,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
 	
-	<description>CMS Tag JSP Tag Library</description>
+	<description>CMS Category JSP Tag Library</description>
 	<tlib-version>1.0</tlib-version>
-	<short-name>tag</short-name>
-	<uri>http://www.arsframework.com/tags/cms/tag</uri>
+	<short-name>category</short-name>
+	<uri>http://www.arsframework.com/tags/cms/category</uri>
 	<tag>
 		<name>count</name>
-		<description>Tag count</description>
-		<tag-class>ars.module.cms.tags.tag.CountTag</tag-class>
+		<description>Category count</description>
+		<tag-class>ars.module.cms.tags.category.CountTag</tag-class>
 		<body-content>scriptless</body-content>
      	<attribute>
             <name>param</name>
@@ -55,9 +55,76 @@
 	</tag>
 	
 	<tag>
+		<name>trees</name>
+		<description>Trees invoke</description>
+		<tag-class>ars.module.cms.tags.category.TreesTag</tag-class>
+		<body-content>scriptless</body-content>
+     	<attribute>
+            <name>param</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>condition</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>page</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>size</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>order</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>group</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>property</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>mapping</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>json</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>string</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>var</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>scope</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+	</tag>
+	
+	<tag>
 		<name>object</name>
 		<description>Object invoke</description>
-		<tag-class>ars.module.cms.tags.tag.ObjectTag</tag-class>
+		<tag-class>ars.module.cms.tags.category.ObjectTag</tag-class>
 		<body-content>scriptless</body-content>
      	<attribute>
             <name>param</name>
@@ -119,7 +186,7 @@
 	<tag>
 		<name>objects</name>
 		<description>Object invoke</description>
-		<tag-class>ars.module.cms.tags.tag.ObjectsTag</tag-class>
+		<tag-class>ars.module.cms.tags.category.ObjectsTag</tag-class>
 		<body-content>scriptless</body-content>
      	<attribute>
             <name>param</name>
@@ -186,7 +253,7 @@
 	<tag>
 		<name>paging</name>
 		<description>Paging invoke</description>
-		<tag-class>ars.module.cms.tags.tag.PagingTag</tag-class>
+		<tag-class>ars.module.cms.tags.category.PagingTag</tag-class>
 		<body-content>scriptless</body-content>
      	<attribute>
             <name>param</name>
@@ -233,7 +300,7 @@
 	<tag>
 		<name>listing</name>
 		<description>Object invoke</description>
-		<tag-class>ars.module.cms.tags.tag.ListingTag</tag-class>
+		<tag-class>ars.module.cms.tags.category.ListingTag</tag-class>
 		<body-content>scriptless</body-content>
      	<attribute>
             <name>param</name>

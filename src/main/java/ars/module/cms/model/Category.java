@@ -1,17 +1,17 @@
 package ars.module.cms.model;
 
-import ars.database.model.AbstractModel;
+import ars.database.model.AbstractTreeModel;
 
 /**
- * 文章标签数据模型
+ * 内容类别数据模型
  * 
  * @author yongqiangwu
- * 
+ *
  */
-public class Tag extends AbstractModel {
+public class Category extends AbstractTreeModel<Category> {
 	private static final long serialVersionUID = 1L;
 
-	private String name; // 标签名称
+	private String name; // 类别名称
 
 	public String getName() {
 		return name;

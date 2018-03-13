@@ -8,8 +8,40 @@
 	<short-name>tag</short-name>
 	<uri>http://www.arsframework.com/tags/cms/content</uri>
 	<tag>
+		<name>url</name>
+		<description>Content url</description>
+		<tag-class>ars.module.cms.tags.content.UrlTag</tag-class>
+		<body-content>scriptless</body-content>
+     	<attribute>
+            <name>entity</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>json</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>string</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>var</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>scope</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+	</tag>
+	
+	<tag>
 		<name>count</name>
-		<description>Tag count</description>
+		<description>Content count</description>
 		<tag-class>ars.module.cms.tags.content.CountTag</tag-class>
 		<body-content>scriptless</body-content>
      	<attribute>
@@ -272,6 +304,53 @@
      	</attribute>
      	<attribute>
             <name>mapping</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>json</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>string</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>var</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>scope</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+	</tag>
+	
+	<tag>
+		<name>view</name>
+		<description>Content view</description>
+		<tag-class>ars.module.cms.tags.content.ViewTag</tag-class>
+		<body-content>scriptless</body-content>
+     	<attribute>
+            <name>param</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>condition</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>page</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>size</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>

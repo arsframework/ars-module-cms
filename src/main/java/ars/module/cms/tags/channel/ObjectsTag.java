@@ -1,7 +1,5 @@
 package ars.module.cms.tags.channel;
 
-import ars.invoke.Invokes;
-import ars.invoke.request.Requester;
 import ars.module.cms.tags.AbstractCmsTag;
 
 /**
@@ -14,8 +12,7 @@ public class ObjectsTag extends AbstractCmsTag {
 
 	@Override
 	protected Object execute() throws Exception {
-		Requester requester = Invokes.getCurrentRequester();
-		return requester.build("cms/channel/objects", this.getParameters()).execute();
+		return this.getRequester().execute("cms/channel/objects", this.getParameters());
 	}
 
 }

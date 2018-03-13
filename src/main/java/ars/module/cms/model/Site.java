@@ -1,27 +1,22 @@
 package ars.module.cms.model;
 
-import java.util.Set;
-import java.util.HashSet;
-
-import ars.module.cms.model.Site;
-import ars.database.model.AbstractTreeModel;
+import ars.database.model.AbstractModel;
 
 /**
- * 内容栏目数据模型
+ * 站点数据模型
  * 
  * @author yongqiangwu
- * 
+ *
  */
-public class Channel extends AbstractTreeModel<Channel> {
+public class Site extends AbstractModel {
 	private static final long serialVersionUID = 1L;
 
-	private String code; // 栏目编号
-	private String name; // 栏目名称
-	private String logo; // 栏目图片
-	private String link; // 外部链接
-	private String template; // 栏目模板
+	private String code; // 站点编号
+	private String name; // 站点名称
+	private String logo; // 站点图标
+	private String domain; // 站点域名
+	private String template; // 首页模板
 	private Boolean staticize = false; // 是否已静态化
-	private Set<Site> sites = new HashSet<Site>(0); // 所属站点
 
 	public String getCode() {
 		return code;
@@ -47,12 +42,12 @@ public class Channel extends AbstractTreeModel<Channel> {
 		this.logo = logo;
 	}
 
-	public String getLink() {
-		return link;
+	public String getDomain() {
+		return domain;
 	}
 
-	public void setLink(String link) {
-		this.link = link;
+	public void setDomain(String domain) {
+		this.domain = domain;
 	}
 
 	public String getTemplate() {
@@ -69,14 +64,6 @@ public class Channel extends AbstractTreeModel<Channel> {
 
 	public void setStaticize(Boolean staticize) {
 		this.staticize = staticize;
-	}
-
-	public Set<Site> getSites() {
-		return sites;
-	}
-
-	public void setSites(Set<Site> sites) {
-		this.sites = sites;
 	}
 
 	@Override

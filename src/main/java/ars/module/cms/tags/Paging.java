@@ -19,11 +19,20 @@ public class Paging implements Serializable {
 	private int count; // 数据总数
 
 	public Paging(int count, int page, int size) {
+		if (count < 0) {
+			throw new IllegalArgumentException("Illegal count:" + count);
+		}
+		if (page < 0) {
+			throw new IllegalArgumentException("Illegal page:" + page);
+		}
+		if (size < 0) {
+			throw new IllegalArgumentException("Illegal size:" + size);
+		}
 		this.page = page;
 		this.size = size;
 		this.count = count;
 		if (count > 0 && size > 0) {
-			this.total = (int) (count % size == 0 ? count / size : Math.ceil((double) count / (double) size));
+			this.total = (int) Math.ceil((double) count / (double) size);
 		}
 		if (this.page > this.total) {
 			this.page = this.total;

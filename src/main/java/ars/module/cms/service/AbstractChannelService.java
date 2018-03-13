@@ -1,23 +1,19 @@
 package ars.module.cms.service;
 
-import java.util.Map;
+import java.io.File;
+import java.io.OutputStream;
 import java.util.List;
 
+import ars.util.Streams;
+import ars.util.Strings;
 import ars.file.Describe;
-import ars.file.Operator;
 import ars.file.disk.DiskOperator;
 import ars.invoke.request.Requester;
-import ars.invoke.request.AccessDeniedException;
 import ars.invoke.request.ParameterInvalidException;
-import ars.invoke.channel.http.HttpChannel;
 import ars.invoke.channel.http.HttpRequester;
 import ars.module.cms.model.Channel;
 import ars.module.cms.service.ChannelService;
-import ars.module.people.model.User;
-import ars.module.people.model.Group;
 import ars.database.repository.Query;
-import ars.database.repository.Repository;
-import ars.database.repository.Repositories;
 import ars.database.service.StandardGeneralService;
 
 /**
@@ -30,30 +26,28 @@ import ars.database.service.StandardGeneralService;
  */
 public abstract class AbstractChannelService<T extends Channel> extends StandardGeneralService<T>
 		implements ChannelService<T> {
-	private Operator operator = new DiskOperator();
+	private String templateDirectory = Strings.TEMP_PATH; // 模板文件目录
+	private String staticizeDirectory = Strings.TEMP_PATH; // 静态化文件目录
 
-	public Operator getOperator() {
-		return operator;
+	public String getTemplateDirectory() {
+		return templateDirectory;
 	}
 
-	public void setOperator(Operator operator) {
-		this.operator = operator;
+	public void setTemplateDirectory(String templateDirectory) {
+		this.templateDirectory = Strings.getRealPath(templateDirectory);
+	}
+
+	public String getStaticizeDirectory() {
+		return staticizeDirectory;
+	}
+
+	public void setStaticizeDirectory(String staticizeDirectory) {
+		this.staticizeDirectory = Strings.getRealPath(staticizeDirectory);
 	}
 
 	@Override
-	public void initObject(Requester requester, T entity, Map<String, Object> parameters) {
-		super.initObject(requester, entity, parameters);
-		if (entity.getGroups().isEmpty()) {
-			throw new ParameterInvalidException("groups", "required");
-		}
-		User owner = Repositories.getRepository(User.class).query().eq("code", requester.getUser()).single();
-		if (!owner.getAdmin()) {
-			for (Group group : entity.getGroups()) {
-				if (!group.getKey().startsWith(owner.getGroup().getKey())) {
-					throw new ParameterInvalidException("groups", "illegal");
-				}
-			}
-		}
+	public void initObject(Requester requester, T entity) {
+		super.initObject(requester, entity);
 		Channel parent = entity.getParent();
 		Query<T> query = this.getRepository().query().ne("id", entity.getId()).eq("name", entity.getName());
 		if (parent == null) {
@@ -66,64 +60,43 @@ public abstract class AbstractChannelService<T extends Channel> extends Standard
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void updateObject(Requester requester, T object) {
-		T parent = (T) object.getParent();
-		Repository<T> repository = this.getRepository();
-		T old = repository.get(object.getId());
-		super.updateObject(requester, object);
-		if (old.getActive() != object.getActive()) {
-			if (object.getActive() == Boolean.TRUE) {
-				while (parent != null) {
-					if (parent.getActive() == Boolean.FALSE) {
-						parent.setActive(true);
-						repository.update(parent);
-					}
-					parent = (T) parent.getParent();
-				}
-			} else if (object.getActive() == Boolean.FALSE) {
-				List<T> channels = repository.query().ne("id", object.getId()).eq("active", true)
-						.start("key", object.getKey()).list();
-				for (int i = 0; i < channels.size(); i++) {
-					T channel = channels.get(i);
-					channel.setActive(false);
-					repository.update(channel);
-				}
-			}
-		}
+	public List<Describe> templates(Requester requester) throws Exception {
+		return new DiskOperator(this.templateDirectory).trees(null, requester.getParameters());
 	}
 
 	@Override
-	public void deleteObject(Requester requester, T object) {
-		User owner = Repositories.getRepository(User.class).query().eq("code", requester.getUser()).single();
-		if (!owner.getAdmin()) {
-			for (Group group : object.getGroups()) {
-				if (!group.getKey().startsWith(owner.getGroup().getKey())) {
-					throw new AccessDeniedException("error.data.unauthorized");
-				}
-			}
-		}
-		super.deleteObject(requester, object);
+	public String view(HttpRequester requester) throws Exception {
+		T channel = this.object(requester);
+		return channel == null || channel.getTemplate() == null ? null : requester.view(channel.getTemplate(), channel);
 	}
 
 	@Override
-	public List<Describe> templates(Requester requester, Map<String, Object> parameters) throws Exception {
-		return this.operator.trees(null, parameters);
-	}
-
-	@Override
-	public String view(HttpRequester requester, Map<String, Object> parameters) throws Exception {
-		T channel = this.object(requester, parameters);
-		return channel == null || channel.getTemplate() == null ? null
-				: ((HttpChannel) requester.getChannel()).view(requester, channel.getTemplate(), channel);
-	}
-
-	@Override
-	public void render(HttpRequester requester, Map<String, Object> parameters) throws Exception {
-		T channel = this.object(requester, parameters);
+	public void render(HttpRequester requester) throws Exception {
+		T channel = this.object(requester);
 		if (channel != null && channel.getTemplate() != null) {
-			((HttpChannel) requester.getChannel()).render(requester, channel.getTemplate(), channel);
+			String name = new StringBuilder("channel_").append(channel.getId()).append(".html").toString();
+			File file = new File(this.staticizeDirectory, name);
+			if (!channel.getStaticize() || !file.exists()) {
+				synchronized (name.intern()) {
+					if (!channel.getStaticize()) {
+						channel = this.object(requester);
+					}
+					if (!channel.getStaticize() || !file.exists()) {
+						requester.render(channel.getTemplate(), channel, file);
+						if (!channel.getStaticize()) {
+							channel.setStaticize(true);
+							this.getRepository().update(channel);
+						}
+					}
+				}
+			}
+			OutputStream os = requester.getHttpServletResponse().getOutputStream();
+			try {
+				Streams.write(file, os);
+			} finally {
+				os.close();
+			}
 		}
 	}
 

@@ -1,16 +1,15 @@
-package ars.module.cms.tags.tag;
+package ars.module.cms.tags.category;
 
 import java.util.Map;
 import java.util.List;
 
-import ars.invoke.Invokes;
-import ars.invoke.request.Requester;
-import ars.module.cms.tags.Listing;
 import ars.module.cms.tags.Paging;
+import ars.module.cms.tags.Listing;
 import ars.module.cms.tags.AbstractCmsTag;
+import ars.invoke.channel.http.HttpRequester;
 
 /**
- * 获取带分页文章标签列表自定义标签
+ * 获取带分页类别列表自定义标签
  * 
  * @author yongqiangwu
  * 
@@ -19,11 +18,11 @@ public class ListingTag extends AbstractCmsTag {
 
 	@Override
 	protected Object execute() throws Exception {
-		Requester requester = Invokes.getCurrentRequester();
+		HttpRequester requester = this.getRequester();
 		Map<String, Object> parameters = this.getParameters();
-		Integer count = (Integer) requester.build("cms/tag/count", parameters).execute();
+		Integer count = (Integer) requester.execute("cms/category/count", parameters);
 		Paging paging = new Paging(count, this.getPage(), this.getSize());
-		List<?> objects = (List<?>) requester.build("cms/tag/objects", parameters).execute();
+		List<?> objects = (List<?>) requester.execute("cms/category/objects", parameters);
 		return new Listing(paging, objects);
 	}
 

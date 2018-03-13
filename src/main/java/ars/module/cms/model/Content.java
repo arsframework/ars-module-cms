@@ -4,9 +4,7 @@ import java.util.Set;
 import java.util.Date;
 import java.util.HashSet;
 
-import ars.invoke.Invokes;
-import ars.invoke.request.Requester;
-import ars.invoke.channel.http.HttpRequester;
+import ars.module.cms.model.Category;
 import ars.database.model.AbstractModel;
 import ars.module.system.model.Attachment;
 
@@ -20,7 +18,6 @@ public class Content extends AbstractModel {
 	private static final long serialVersionUID = 1L;
 
 	private String title; // 文章标题
-	private String tag; // 文章标签
 	private String txt; // 文章正文
 	private String logo; // 标题图
 	private String link; // 外部链接
@@ -32,25 +29,10 @@ public class Content extends AbstractModel {
 	private Boolean recommend = false; // 是否推荐
 	private Integer accesses = 0; // 访问次数
 	private Date released = new Date(); // 发布日期
+	private Boolean staticize = false; // 是否已静态化
 	private Set<Channel> channels = new HashSet<Channel>(0); // 栏目集合
+	private Set<Category> categories = new HashSet<Category>(0); // 类别集合
 	private Set<Attachment> attachments = new HashSet<Attachment>(0); // 附件集合
-
-	/**
-	 * 获取访问路径
-	 * 
-	 * @return 访问路径
-	 */
-	public String getUrl() {
-		if (this.link != null) {
-			return this.link;
-		}
-		Requester requester = Invokes.getCurrentRequester();
-		StringBuilder url = new StringBuilder();
-		if (requester instanceof HttpRequester) {
-			url.append(((HttpRequester) requester).getHttpServletRequest().getContextPath());
-		}
-		return url.append("/cms/content/view?id=").append(this.getId()).toString();
-	}
 
 	public String getTitle() {
 		return title;
@@ -58,14 +40,6 @@ public class Content extends AbstractModel {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getTag() {
-		return tag;
-	}
-
-	public void setTag(String tag) {
-		this.tag = tag;
 	}
 
 	public String getTxt() {
@@ -156,12 +130,28 @@ public class Content extends AbstractModel {
 		this.released = released;
 	}
 
+	public Boolean getStaticize() {
+		return staticize;
+	}
+
+	public void setStaticize(Boolean staticize) {
+		this.staticize = staticize;
+	}
+
 	public Set<Channel> getChannels() {
 		return channels;
 	}
 
 	public void setChannels(Set<Channel> channels) {
 		this.channels = channels;
+	}
+
+	public Set<Category> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(Set<Category> categories) {
+		this.categories = categories;
 	}
 
 	public Set<Attachment> getAttachments() {

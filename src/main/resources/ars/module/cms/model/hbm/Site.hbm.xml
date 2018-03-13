@@ -3,37 +3,24 @@
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="ars.module.cms.model.Channel" table="ARS_CMS_CHANNEL">
+	<class name="ars.module.cms.model.Site" table="ARS_CMS_SITE">
 		<id name="id" column="ID_" type="int">
 			<generator class="native"/>
 		</id>
 		<property name="code" column="CODE_" type="string" length="50" not-null="true" unique="true"/>
-		<property name="name" column="NAME_" type="string" length="50" not-null="true"/>
-		<property name="link" column="LINK_" type="string" length="100"/>
+		<property name="name" column="NAME_" type="string" length="50" not-null="true" unique="true"/>
 		<property name="logo" column="LOGO_" type="string" length="50"/>
-		<property name="template" column="TEMPLATE_" type="string" length="50"/>
+		<property name="domain" column="DOMAIN_" type="string" length="50" not-null="true" unique="true"/>
+		<property name="template" column="TEMPLATE_" type="string" length="50" not-null="true"/>
 		<property name="staticize" column="STATICIZE_" type="boolean" not-null="true"/>
-		<set name="sites" fetch="subselect" lazy="false" table="ARS_CMS_CHANNEL_SITES">
-			<key column="CHANNEL_ID_" not-null="true"/>
-			<many-to-many class="ars.module.cms.model.Site" column="SITE_ID_"/>
-		</set>
-		<property name="key" column="KEY_" type="string" length="50" not-null="true" unique="true"/>
-		<property name="level" column="LEVEL_" type="int" not-null="true"/>
-		<property name="leaf" column="LEAF_" type="boolean" not-null="true"/>
 		<property name="order" column="ORDER_" type="double"/>
 		<property name="status" column="STATUS_" type="int" not-null="true"/>
 		<property name="active" column="ACTIVE_" type="boolean" not-null="true"/>
-		<property name="remark" column="REMARK_" type="string" length="500"/>
+		<property name="remark" column="REMARK_" type="string" length="50"/>
 		<property name="creator" column="CREATOR_" type="string" length="50"/>
 		<property name="updater" column="UPDATER_" type="string" length="50"/>
 		<property name="process" column="PROCESS_" type="string" length="50"/>
 		<property name="dateJoined" column="DATE_JOINED_" type="timestamp" not-null="true"/>
 		<property name="dateUpdate" column="DATE_UPDATE_" type="timestamp"/>
-		<many-to-one name="parent" column="PARENT_ID_" class="ars.module.cms.model.Channel" fetch="join" lazy="false"/>
-		<list name="children" inverse="true">
-			<key column="PARENT_ID_"/>
-			<index column="ORDER_"/>
-			<one-to-many class="ars.module.cms.model.Channel"/>
-		</list>
 	</class>
 </hibernate-mapping>

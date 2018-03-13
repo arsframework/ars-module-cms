@@ -3,16 +3,16 @@ package ars.module.cms.tags.channel;
 import ars.module.cms.tags.AbstractCmsTag;
 
 /**
- * 获取单个栏目自定义标签
+ * 获取栏目视图
  * 
  * @author yongqiangwu
  * 
  */
-public class ObjectTag extends AbstractCmsTag {
+public class ViewTag extends AbstractCmsTag {
 
 	@Override
 	protected Object execute() throws Exception {
-		return this.getRequester().execute("cms/channel/object", this.getParameters());
+		return this.getRequester().execute("cms/channel/view", this.getParameters());
 	}
 
 }

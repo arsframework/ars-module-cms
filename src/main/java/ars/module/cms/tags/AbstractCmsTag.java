@@ -19,7 +19,7 @@ public abstract class AbstractCmsTag extends AbstractTag {
 	private Object param; // 参数，支持键/值对形式或字符串形式。如果为字符串则多个条件使用“,”号隔开；如果参数值为多个值，则使用“[]”包围，并且每个值使用“,”号隔开。
 	private int page; // 页码
 	private int size; // 页面大小
-	private String order = "order"; // 排序（多个排序属性之间使用“,”号隔开）
+	private String order; // 排序（多个排序属性之间使用“,”号隔开）
 	private String condition; // 高级查询
 
 	public Object getParam() {

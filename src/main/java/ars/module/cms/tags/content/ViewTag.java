@@ -3,16 +3,16 @@ package ars.module.cms.tags.content;
 import ars.module.cms.tags.AbstractCmsTag;
 
 /**
- * 获取文章数量自定义标签
+ * 获取内容视图
  * 
  * @author yongqiangwu
  * 
  */
-public class CountTag extends AbstractCmsTag {
+public class ViewTag extends AbstractCmsTag {
 
 	@Override
 	protected Object execute() throws Exception {
-		return this.getRequester().execute("cms/content/count", this.getParameters());
+		return this.getRequester().execute("cms/content/view", this.getParameters());
 	}
 
 }
