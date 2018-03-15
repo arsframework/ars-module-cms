@@ -13,7 +13,7 @@
 		<property name="link" column="LINK_" type="string" length="100"/>
 		<property name="author" column="AUTHOR_" type="string" length="50"/>
 		<property name="origin" column="ORIGIN_" type="string" length="50"/>
-		<property name="template" column="TEMPLATE_" type="string" length="100"/>
+		<property name="template" column="TEMPLATE_" type="string" length="50"/>
 		<property name="top" column="TOP_" type="boolean" not-null="true"/>
 		<property name="focus" column="FOCUS_" type="boolean" not-null="true"/>
 		<property name="recommend" column="RECOMMEND_" type="boolean" not-null="true"/>
