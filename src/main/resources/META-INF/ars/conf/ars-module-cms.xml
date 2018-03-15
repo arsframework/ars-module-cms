@@ -37,7 +37,9 @@
 	</bean>
 	
 	<!-- Site Service -->
-	<bean class="ars.module.cms.service.StandardSiteService"/>
+	<bean class="ars.module.cms.service.StandardSiteService">
+		<property name="templateDirectory" value="../../WEB-INF/templates/front/cms/site"/>
+	</bean>
 	
 	<!-- Channel Service -->
 	<bean class="ars.module.cms.service.StandardChannelService">
