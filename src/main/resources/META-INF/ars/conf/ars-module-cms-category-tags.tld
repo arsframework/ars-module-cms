@@ -18,17 +18,17 @@
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
+            <name>append</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>remove</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
             <name>condition</name>
-            <required>false</required>
-            <rtexprvalue>true</rtexprvalue>
-     	</attribute>
-     	<attribute>
-            <name>page</name>
-            <required>false</required>
-            <rtexprvalue>true</rtexprvalue>
-     	</attribute>
-     	<attribute>
-            <name>size</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -65,7 +65,12 @@
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
-            <name>condition</name>
+            <name>append</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>remove</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -81,6 +86,11 @@
      	</attribute>
      	<attribute>
             <name>order</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>condition</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -132,7 +142,12 @@
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
-            <name>condition</name>
+            <name>append</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>remove</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -148,6 +163,11 @@
      	</attribute>
      	<attribute>
             <name>order</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>condition</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -194,7 +214,12 @@
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
-            <name>condition</name>
+            <name>append</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>remove</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -210,6 +235,11 @@
      	</attribute>
      	<attribute>
             <name>order</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>condition</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -261,18 +291,18 @@
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
-            <name>condition</name>
+            <name>append</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
-            <name>page</name>
-            <required>true</required>
+            <name>remove</name>
+            <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
-            <name>size</name>
-            <required>true</required>
+            <name>condition</name>
+            <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
@@ -308,7 +338,12 @@
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
      	<attribute>
-            <name>condition</name>
+            <name>append</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>remove</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
@@ -324,6 +359,11 @@
      	</attribute>
      	<attribute>
             <name>order</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+     	</attribute>
+     	<attribute>
+            <name>condition</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
      	</attribute>
