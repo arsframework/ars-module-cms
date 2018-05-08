@@ -5,32 +5,31 @@ import ars.invoke.channel.http.tags.AbstractTag;
 
 /**
  * 获取内容资源访问地址
- * 
- * @author yongqiangwu
  *
+ * @author wuyongqiang
  */
 public class UrlTag extends AbstractTag {
-	private Content entity;
+    private Content entity;
 
-	public Content getEntity() {
-		return entity;
-	}
+    public Content getEntity() {
+        return entity;
+    }
 
-	public void setEntity(Content entity) {
-		this.entity = entity;
-	}
+    public void setEntity(Content entity) {
+        this.entity = entity;
+    }
 
-	@Override
-	protected Object execute() throws Exception {
-		if (this.entity.getLink() != null) {
-			return this.entity.getLink();
-		}
-		String context = this.getRequester().getHttpServletRequest().getContextPath();
-		StringBuilder url = new StringBuilder();
-		if (context != null && !context.isEmpty()) {
-			url.append(context);
-		}
-		return url.append("/cms/content/render?id=").append(this.entity.getId()).toString();
-	}
+    @Override
+    protected Object execute() throws Exception {
+        if (this.entity.getLink() != null) {
+            return this.entity.getLink();
+        }
+        String context = this.getRequester().getHttpServletRequest().getContextPath();
+        StringBuilder url = new StringBuilder();
+        if (context != null && !context.isEmpty()) {
+            url.append(context);
+        }
+        return url.append("/cms/content/render?id=").append(this.entity.getId()).toString();
+    }
 
 }

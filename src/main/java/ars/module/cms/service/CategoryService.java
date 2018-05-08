@@ -7,11 +7,9 @@ import ars.database.service.BasicService;
 
 /**
  * 内容类别业务操作接口
- * 
- * @author yongqiangwu
- * 
- * @param <T>
- *            数据模型
+ *
+ * @param <T> 数据模型
+ * @author wuyongqiang
  */
 @Api("cms/category")
 public interface CategoryService<T extends Category> extends BasicService<T>, TreeService<T> {

@@ -5,9 +5,8 @@ import ars.file.DocumentManager;
 
 /**
  * 静态资源业务操作接口
- * 
- * @author yongqiangwu
- * 
+ *
+ * @author wuyongqiang
  */
 @Api("cms/static")
 public interface StaticService extends DocumentManager {

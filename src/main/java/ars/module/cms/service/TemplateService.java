@@ -5,9 +5,8 @@ import ars.file.DocumentManager;
 
 /**
  * 模板资源业务操作接口
- * 
- * @author yongqiangwu
- * 
+ *
+ * @author wuyongqiang
  */
 @Api("cms/template")
 public interface TemplateService extends DocumentManager {
